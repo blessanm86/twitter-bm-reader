@@ -1,6 +1,5 @@
 var express = require('express');
 var session = require('express-session');
-var Purest = require('purest');
 var path = require('path');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
@@ -9,6 +8,7 @@ var bodyParser = require('body-parser');
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
+var twitter = require('./app_modules/twitter-api');
 
 var Grant = require('grant-express');
 var grantConfig = require('./config/grant-oauth.json');
@@ -33,22 +33,13 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(grant);
 
-// app.use(function(req, res, next) {
-//   if (req.path.substr(-1) == '/' && req.path.length > 1) {
-//     var query = req.url.slice(req.path.length);
-//     res.redirect(301, req.path.slice(0, -1) + query);
-//   } else {
-//     next();
-//   }
-// });
-
 app.use('/', routes);
 
-app.get('/twitter/authorised', function (req, res) {
-  res.redirect('/'+ req.session.grant.response.raw.screen_name);
+app.get('/twitter/authorised/', function (req, res) {
+  res.redirect('/'+ req.session.grant.response.raw.screen_name + '/');
 });
 
-app.get('/:username', function(req, res) {
+app.get('/:username/', function(req, res) {
   try {
     res.render('home', { screen_name: req.session.grant.response.raw.screen_name });
   } catch(e) {
@@ -57,22 +48,30 @@ app.get('/:username', function(req, res) {
 });
 
 //api to fetch profile information
-app.get('/:username/profile', function(req, res) {
-  fetchFromTwitter(req, res, function() {
+app.get('/:username/profile/', function(req, res) {
+  var response = res;
+
+  twitter(req, res, function() {
     return {
       path: 'users/show',
       condition: {screen_name: req.session.grant.response.raw.screen_name}
     }
+  }, function(err,res, body) {
+    response.status(200).json(body);
   });
 });
 
 //api to tweets
-app.get('/:username/tweets', function(req, res) {
-  fetchFromTwitter(req, res, function() {
+app.get('/:username/tweets/', function(req, res) {
+  var response = res;
+
+  twitter(req, res, function() {
     return {
       path: 'statuses/home_timeline',
       condition: {count:2}
     }
+  }, function(err,res, body) {
+    response.status(200).json(body);
   });
 });
 
@@ -106,35 +105,5 @@ app.use(function(err, req, res, next) {
     error: {}
   });
 });
-
-function fetchFromTwitter(req, res, data) {
-
-  //If session expires code will fail as no token is available. Then redirect to root to initiate authorisation
-  try {
-    data = data();
-
-    var path = data.path;
-    var condition = data.condition;
-    var access_token = req.session.grant.response.access_token;
-    var access_secret = req.session.grant.response.access_secret;
-    var key = grantConfig.twitter.key;
-    var secret = grantConfig.twitter.secret;
-    var response = res;
-    var twitter = new Purest({provider:'twitter', key: key, secret});
-
-    twitter.query()
-      .select(path)
-      .where(condition)
-      .auth(access_token, access_secret)
-      .request(function (err, res, body) {
-        response.end(JSON.stringify(body, null, 2));
-      });
-  } catch(e) {
-    console.log(e);
-    res.redirect('/');
-  }
-
-}
-
 
 module.exports = app;

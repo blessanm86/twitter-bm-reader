@@ -14,6 +14,7 @@
     "express-session": "^1.11.3",
     "grant-express": "^3.5.1",
     "hbs": "~2.9.0",
+    "lowdb": "^0.10.2",
     "morgan": "~1.5.3",
     "purest": "^2.0.0",
     "serve-favicon": "~2.2.1"
