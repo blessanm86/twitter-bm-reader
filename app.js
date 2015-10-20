@@ -120,7 +120,7 @@ function fetchFromTwitter(req, res, data) {
     var key = grantConfig.twitter.key;
     var secret = grantConfig.twitter.secret;
     var response = res;
-    var twitter = new Purest({provider:'twitter', key: key, secret});
+    var twitter = new Purest({provider:'twitter', key: key, secret:secret});
 
     twitter.query()
       .select(path)
