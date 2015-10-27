@@ -53,14 +53,17 @@ app.get('/:username/', function(req, res) {
 app.get('/:username/profile/', function(req, res) {
   var response = res;
 
-  twitter(req, res, function() {
-    return {
-      path: 'users/show',
-      condition: {screen_name: req.session.grant.response.raw.screen_name}
-    }
-  }, function(err,res, body) {
-    response.status(200).json(body);
-  });
+  // twitter(req, res, function() {
+  //   return {
+  //     path: 'users/show',
+  //     condition: {screen_name: req.session.grant.response.raw.screen_name}
+  //   }
+  // }, function(err,res, body) {
+  //   response.status(200).json(body);
+  // });
+
+  var profile = {"id":1565774833,"id_str":"1565774833","name":"Blessan Mathew","screen_name":"blessenm86","location":"India","profile_location":null,"description":"Javascript Programmer, Mobility Developer at Cognizant Technology Solutions. From Kerala, India","url":"http://t.co/qXK9JqyPoF","entities":{"url":{"urls":[{"url":"http://t.co/qXK9JqyPoF","expanded_url":"http://www.blessanmathew.com","display_url":"blessanmathew.com","indices":[0,22]}]},"description":{"urls":[]}},"protected":false,"followers_count":110,"friends_count":355,"listed_count":20,"created_at":"Wed Jul 03 13:12:18 +0000 2013","favourites_count":124,"utc_offset":null,"time_zone":null,"geo_enabled":false,"verified":false,"statuses_count":911,"lang":"en","status":{"created_at":"Thu Oct 15 15:33:56 +0000 2015","id":654681619635138600,"id_str":"654681619635138560","text":"RT @HugoGiraudel: Amazing overview of ES6 in 350 bullet points by @ponyfoo: https://t.co/lpUDc6WPMn.","source":"<a href=\"http://twitter.com/download/android\" rel=\"nofollow\">Twitter for Android</a>","truncated":false,"in_reply_to_status_id":null,"in_reply_to_status_id_str":null,"in_reply_to_user_id":null,"in_reply_to_user_id_str":null,"in_reply_to_screen_name":null,"geo":null,"coordinates":null,"place":null,"contributors":null,"retweeted_status":{"created_at":"Thu Oct 15 15:27:25 +0000 2015","id":654679980274643000,"id_str":"654679980274642949","text":"Amazing overview of ES6 in 350 bullet points by @ponyfoo: https://t.co/lpUDc6WPMn.","source":"<a href=\"https://about.twitter.com/products/tweetdeck\" rel=\"nofollow\">TweetDeck</a>","truncated":false,"in_reply_to_status_id":null,"in_reply_to_status_id_str":null,"in_reply_to_user_id":null,"in_reply_to_user_id_str":null,"in_reply_to_screen_name":null,"geo":null,"coordinates":null,"place":null,"contributors":null,"retweet_count":9,"favorite_count":23,"entities":{"hashtags":[],"symbols":[],"user_mentions":[{"screen_name":"ponyfoo","name":"Pony Foo","id":1447284511,"id_str":"1447284511","indices":[48,56]}],"urls":[{"url":"https://t.co/lpUDc6WPMn","expanded_url":"https://ponyfoo.com/articles/es6","display_url":"ponyfoo.com/articles/es6","indices":[58,81]}]},"favorited":true,"retweeted":true,"possibly_sensitive":false,"lang":"en"},"retweet_count":9,"favorite_count":0,"entities":{"hashtags":[],"symbols":[],"user_mentions":[{"screen_name":"HugoGiraudel","name":"Hugo Giraudel","id":551949534,"id_str":"551949534","indices":[3,16]},{"screen_name":"ponyfoo","name":"Pony Foo","id":1447284511,"id_str":"1447284511","indices":[66,74]}],"urls":[{"url":"https://t.co/lpUDc6WPMn","expanded_url":"https://ponyfoo.com/articles/es6","display_url":"ponyfoo.com/articles/es6","indices":[76,99]}]},"favorited":true,"retweeted":true,"possibly_sensitive":false,"lang":"en"},"contributors_enabled":false,"is_translator":false,"is_translation_enabled":false,"profile_background_color":"C0DEED","profile_background_image_url":"http://abs.twimg.com/images/themes/theme1/bg.png","profile_background_image_url_https":"https://abs.twimg.com/images/themes/theme1/bg.png","profile_background_tile":false,"profile_image_url":"http://pbs.twimg.com/profile_images/378800000082186023/8bb9ca172b27c49a5d0d3eb79e8d11fc_normal.jpeg","profile_image_url_https":"https://pbs.twimg.com/profile_images/378800000082186023/8bb9ca172b27c49a5d0d3eb79e8d11fc_normal.jpeg","profile_banner_url":"https://pbs.twimg.com/profile_banners/1565774833/1401072511","profile_link_color":"0084B4","profile_sidebar_border_color":"C0DEED","profile_sidebar_fill_color":"DDEEF6","profile_text_color":"333333","profile_use_background_image":true,"has_extended_profile":false,"default_profile":true,"default_profile_image":false,"following":false,"follow_request_sent":false,"notifications":false,"suspended":false,"needs_phone_verification":false};
+  res.status(200).json(profile);
 });
 
 //api to tweets
