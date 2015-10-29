@@ -55,6 +55,7 @@ function fetchData(url, callback) {
   })
   .then(callback)
   .catch(function(err) {
+    console.log('Fetch Err');
     console.log(err);
   });
 }
