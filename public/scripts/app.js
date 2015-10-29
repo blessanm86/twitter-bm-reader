@@ -47,7 +47,8 @@ function getTweets() {
 
 function fetchData(url, callback) {
   return fetch(url, {
-    method: 'get'
+    method: 'get',
+    credentials: 'same-origin'
   })
   .then(function(response) {
     return response.json();

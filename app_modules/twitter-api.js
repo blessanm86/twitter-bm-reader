@@ -25,7 +25,6 @@ function fetchFromTwitter(req, res, params, callback) {
   } catch(e) {
     console.log('ERRORED OUT');
     console.log(e);
-    res.redirect('/');
   }
 
 }
