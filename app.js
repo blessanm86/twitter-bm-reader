@@ -8,34 +8,24 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
 
 var middlewares = {
+  morgan:  require('./middlewares/morgan'),
   session: require('./middlewares/express-session'),
   favicon: require('./middlewares/serve-favicon'),
-  morgan:  require('./middlewares/morgan'),
   cookie:  require('./middlewares/cookie-parser'),
   static:  require('./middlewares/static'),
+  grant:  require('./middlewares/grant-express'),
 };
 
+app.use(middlewares.morgan('dev'));
+app.use(middlewares.session({secret:'very secret'}));
+app.use(middlewares.favicon(path.join(__dirname ,'public/images/favicon.ico')));
+app.use(middlewares.cookie());
+app.use(middlewares.static(path.join(__dirname, 'public')));
+app.use(middlewares.grant);
+
 var routes = require('./routes/index');
-var users = require('./routes/users');
 var twitter = require('./app_modules/twitter-api');
 var tweetToHTML = require('tweet-to-html');
-var low = require('lowdb');
-
-var Grant = require('grant-express');
-var grantConfig = require('./config/grant-oauth.json');
-
-var grant = new Grant(grantConfig);
-
-
-app.use(middlewares.session);
-app.use(middlewares.favicon);
-app.use(middlewares.morgan);
-app.use(middlewares.cookie);
-app.use(middlewares.static);
-
-
-
-app.use(grant);
 
 app.use('/', routes);
 

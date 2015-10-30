@@ -1,3 +1,3 @@
 var logger = require('morgan');
 
-module.exports = logger('dev');
+module.exports = logger;
