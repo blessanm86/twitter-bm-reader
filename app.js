@@ -9,9 +9,9 @@ app.set('view engine', 'hbs');
 
 var middlewares = {
   morgan:  require('./middlewares/morgan'),
+  cookie:  require('./middlewares/cookie-parser'),
   session: require('./middlewares/express-session'),
   favicon: require('./middlewares/serve-favicon'),
-  cookie:  require('./middlewares/cookie-parser'),
   static:  require('./middlewares/static'),
   grant:  require('./middlewares/grant-express'),
   error: require('./middlewares/error')
@@ -23,9 +23,9 @@ var routers = {
 }
 
 app.use(middlewares.morgan('dev'));
+app.use(middlewares.cookie());
 app.use(middlewares.session({secret:'very secret'}));
 app.use(middlewares.favicon(path.join(__dirname ,'public/images/favicon.ico')));
-app.use(middlewares.cookie());
 app.use(middlewares.static(path.join(__dirname, 'public')));
 app.use(middlewares.grant);
 
