@@ -6,7 +6,6 @@ var databasePath = './database';
 
 var usersDb = lowDb(path.join(databasePath, 'users.json'));
 usersDb = usersDb('users');
-var _ = usersDb._;
 
 module.exports.getUser = getUser;
 module.exports.saveUser = saveUser;

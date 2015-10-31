@@ -65,18 +65,32 @@ function setupEventListeners() {
   var iframe = document.querySelector('.bmr-tweet-page');
 
   list.addEventListener('click', function(event) {
+    var url = '';
     var target = event.target; // Clicked element
-    while (target && target.parentNode !== list) {
+
+    if(target.tagName === 'A') {
+      //For anchor elements open their link in a new window.
+
+      event.preventDefault();
+      url = target.href;
+    } else {
+      //Search upto li tag.
+
+      while (target && target.parentNode !== list) {
         target = target.parentNode; // If the clicked element isn't a direct child
         if(!target) { return; } // If element doesn't exist
-    }
-    //console.log(target);
-    if (target.tagName === 'LI'){
+      }
+
+      if (target.tagName === 'LI'){
         var id = target.getAttribute('data-id');
         var username = target.getAttribute('data-username');
         //iframe.setAttribute('src', `https://twitter.com/${username}/status/${id}`); //Cant be done to frameblocker
-        window.open(`https://twitter.com/${username}/status/${id}`, '_blank');
+        url = `https://twitter.com/${username}/status/${id}`;
+
+      }
     }
+
+    window.open(url, '_blank');
   });
 }
 

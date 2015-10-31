@@ -24,13 +24,13 @@ router.get('/twitter/authorised/', function (req, res) {
 });
 
 //Checks if twitter session is set. Elese redirect for login.
-router.use(function(req, res, next) {
-  if(!req.session.grant) {
-    res.redirect('/');
-  } else {
-    next();
-  }
-});
+// router.use(function(req, res, next) {
+//   if(!req.session.grant) {
+//     res.redirect('/');
+//   } else {
+//     next();
+//   }
+// });
 
 router.get('/:username/', function(req, res) {
   var username = req.params.username;

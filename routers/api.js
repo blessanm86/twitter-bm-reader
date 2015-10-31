@@ -1,19 +1,20 @@
 var express = require('express');
-var twitter = require('../app_modules/twitter-api');
 var tweetToHTML = require('tweet-to-html');
+var twitter = require('../app_modules/twitter-api');
+var dbManager = require('../app_modules/db-manager');
 
 var router = express.Router();
 
 //api to fetch profile information
 router.get('/:username/profile/', function(req, res) {
   var response = res;
+  var username = req.params.username;
 
-  twitter(req, res, function() {
-    return {
-      path: 'users/show',
-      condition: {screen_name: req.session.grant.response.raw.screen_name}
-    }
-  }, function(err,res, body) {
+  var path = 'users/show';
+  var tokens = dbManager.getUser(username);
+  var condition = {screen_name: username};
+
+  twitter(req, res, {path, tokens, condition}, function(err,res, body) {
     if(err) {
       response.status(401).json(err);
     } else {
@@ -28,13 +29,13 @@ router.get('/:username/profile/', function(req, res) {
 //api to tweets
 router.get('/:username/tweets/', function(req, res) {
   var response = res;
+  var username = req.params.username;
 
-  twitter(req, res, function() {
-    return {
-      path: 'statuses/home_timeline',
-      condition: {count: 10}
-    }
-  }, function(err,res, body) {
+  var path = 'statuses/home_timeline';
+  var tokens = dbManager.getUser(username);
+  var condition = {count: 10};
+
+  twitter(req, res, {path, tokens, condition}, function(err,res, body) {
     if(err) {
       response.status(401).json(err);
     } else {
