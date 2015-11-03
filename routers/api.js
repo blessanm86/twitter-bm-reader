@@ -9,12 +9,9 @@ var router = express.Router();
 router.get('/:username/profile/', function(req, res) {
   var response = res;
   var username = req.params.username;
-
-  var path = 'users/show';
-  var tokens = dbManager.getUser(username);
   var condition = {screen_name: username};
 
-  twitter(req, res, {path, tokens, condition}, function(err,res, body) {
+  twitter.fetchProfile(username, condition, function(err,res, body) {
     if(err) {
       response.status(401).json(err);
     } else {
@@ -30,12 +27,9 @@ router.get('/:username/profile/', function(req, res) {
 router.get('/:username/tweets/', function(req, res) {
   var response = res;
   var username = req.params.username;
-
-  var path = 'statuses/home_timeline';
-  var tokens = dbManager.getUser(username);
   var condition = {count: 10};
 
-  twitter(req, res, {path, tokens, condition}, function(err,res, body) {
+  twitter.fetchHomeTimeline(username, condition, function(err,res, body) {
     if(err) {
       response.status(401).json(err);
     } else {

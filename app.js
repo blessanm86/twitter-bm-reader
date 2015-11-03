@@ -1,9 +1,11 @@
 var express = require('express');
 var path = require('path');
 
+var workerManager = require('./app_modules/worker-manager');
+workerManager.setup();
+
 var app = express();
 
-// view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
 

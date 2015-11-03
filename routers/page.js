@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var dbManager = require('../app_modules/db-manager');
+var workerManager = require('../app_modules/worker-manager');
 
 router.get('/', function(req, res, next) {
   var username = req.cookies.username;
@@ -12,15 +13,18 @@ router.get('/', function(req, res, next) {
 router.get('/twitter/authorised/', function (req, res) {
   var twitterResponse = req.session.grant.response;
 
-  dbManager.saveUser({
+  var jobData = {
     username: twitterResponse.raw.screen_name,
     accessToken: twitterResponse.access_token,
     accessSecret: twitterResponse.access_secret
-  });
+  };
 
   //Ensure sync is run atleast once before redirection TODO.
-
-  res.redirect(`/${twitterResponse.raw.screen_name}/`);
+  console.log('In Page');
+  workerManager.addWork({jobName: 'syncUser', jobData}, function() {
+    console.log('done');
+    //res.redirect(`/${twitterResponse.raw.screen_name}/`);
+  });
 });
 
 //Checks if twitter session is set. Elese redirect for login.
