@@ -20,10 +20,8 @@ router.get('/twitter/authorised/', function (req, res) {
   };
 
   //Ensure sync is run atleast once before redirection TODO.
-  console.log('In Page');
   workerManager.addWork({jobName: 'syncUser', jobData}, function() {
-    console.log('done');
-    //res.redirect(`/${twitterResponse.raw.screen_name}/`);
+    res.redirect(`/${twitterResponse.raw.screen_name}/`);
   });
 });
 
@@ -38,14 +36,18 @@ router.get('/twitter/authorised/', function (req, res) {
 
 router.get('/:username/', function(req, res) {
   var username = req.params.username;
-  var user = dbManager.getUser(username);
 
-  if(user) {
-    res.cookie('username', username, { maxAge: 1000*60 * 5, httpOnly: true })
-    res.render('home');
-  } else {
-    res.redirect('/connect/twitter/');
-  }
+  setTimeout(function() {
+    dbManager.getUser(username, function(user) {
+      if(user) {
+        res.cookie('username', username, { maxAge: 1000*60 * 5, httpOnly: true })
+        res.render('home');
+      } else {
+        res.redirect('/connect/twitter/');
+      }
+    });
+  }, 2000);
+
 });
 
 module.exports = router;

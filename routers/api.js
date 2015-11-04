@@ -1,7 +1,6 @@
 var express = require('express');
 var tweetToHTML = require('tweet-to-html');
 var twitter = require('../app_modules/twitter-api');
-var dbManager = require('../app_modules/db-manager');
 
 var router = express.Router();
 

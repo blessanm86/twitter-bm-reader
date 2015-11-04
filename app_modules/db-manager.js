@@ -1,47 +1,33 @@
-var lowDb = require('lowdb');
-var path = require('path');
+var TingoDb = require('tingodb')().Db;
+//var MongoDb = require('mongodb');
 var merge = require('lodash.merge');
 
-module.exports.getUser = getUser;
-module.exports.saveUser = saveUser;
-module.exports.getUsers = getUsers;
-module.exports.save = save;
+var db = new TingoDb('./database', {});
+//var db = new MongoDb.Db('test', new MongoDb.Server('locahost', 27017));
+var usersCollection = db.collection('users');;
 
-var databasePath = './database';
+module.exports = {getUser, saveUser};
 
-var DB = lowDb(path.join(databasePath, 'users.json'), {
-  autosave: true,
-  async: false
-});
-usersDb = DB('users');
-
-
-function getUser(username) {
-  return usersDb.find({username: username});
+function getUser(username, callback) {
+  usersCollection.find({username: username}, function(err, result) {
+    callback(result);
+  });
 }
 
-function saveUser(userData) {console.log('saveUser');
-  var newUserObj = {syncCount: 0, tweets: []};
+function saveUser(userData, callback) {
+  var newUser = {syncCount: 0, tweets: []};
+  var condition = {username: userData.username};
 
-  var userObj = usersDb.find({username: userData.username});
+  getUser(condition, function(user) {
+    if(user) {
+      user = merge(user, userData); //user is already in db but new tokens need to be updated in db.
+    } else {
+      user = merge(newUser, userData); //adding new user
+    }
 
-  if(userObj) {
-    merge(userObj, userData);
-    usersDb.chain().find({username: userData.username}).assign(userObj).value().save();
-  } else {
-    merge(newUserObj, userData);console.log(newUserObj);
-    usersDb.push(newUserObj);
-  }
-}
-
-function getUsers() {
-  return usersDb;
-}
-
-function save() {
-  DB.save();
-}
-
-function addTweets() {
-  usersDb.chain().find({username: userData.username}).assign(db.object.test.concat([3,4])).value();
+    usersCollection.update(condition, user, {upsert: true, w: 2}, function(err, result, status) {
+      console.log(err, result, status);
+      callback(result);
+    });
+  });
 }
