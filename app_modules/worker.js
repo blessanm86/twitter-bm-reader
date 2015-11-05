@@ -6,12 +6,19 @@ var twitterApi = require('./twitter-api');
 
 var handlers = {
   'syncUser': syncUser,
-  'syncUsers': syncUsers
+  'syncUsers': syncUsers,
+  getUser
 };
 
 process.on('message', function(work) {
   handlers[work.jobName](work.jobData);
 });
+
+function getUser(userData) {
+  dbManager.getUser(userData.username, function(user) {
+    endWork(user);
+  });
+}
 
 function syncUser(userData) {
   dbManager.saveUser(userData, function(user) {
@@ -56,6 +63,6 @@ function updateUser(user) {
 
 
 
-function endWork() {
-  process.send('done');
+function endWork(user) {
+  process.send(user);
 }

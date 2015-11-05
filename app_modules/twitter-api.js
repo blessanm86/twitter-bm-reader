@@ -1,5 +1,6 @@
 var Purest = require('purest');
 var dbManager = require('./db-manager');
+var workerManager = require('./worker-manager');
 
 var grantConfig = require('../config/grant-oauth.json');
 
@@ -25,7 +26,7 @@ function fetchHomeTimeline(username, condition, callback) {
 function fetchFromTwitter(username, params, callback) {
 
   try {
-    dbManager.getUser(username, function(result) {
+    workerManager.addWork({jobName: 'getUser', jobData:{username}}, function(result) {
       params.tokens = result;
 
       var path = params.path;

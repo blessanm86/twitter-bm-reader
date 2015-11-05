@@ -30,9 +30,9 @@ function createObserverForQueue() {
 function createAWorker() {
   worker = fork('./app_modules/worker.js');
 
-  worker.on('message', function done(name) {
+  worker.on('message', function done(message) {
     isWorking = false;
-    callbacks.shift()();
+    callbacks.shift()(message);
 
     if(workerQueue.length) {
       work();

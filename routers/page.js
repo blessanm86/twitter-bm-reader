@@ -37,16 +37,23 @@ router.get('/twitter/authorised/', function (req, res) {
 router.get('/:username/', function(req, res) {
   var username = req.params.username;
 
-  setTimeout(function() {
-    dbManager.getUser(username, function(user) {
-      if(user) {
-        res.cookie('username', username, { maxAge: 1000*60 * 5, httpOnly: true })
-        res.render('home');
-      } else {
-        res.redirect('/connect/twitter/');
-      }
-    });
-  }, 2000);
+  workerManager.addWork({jobName: 'getUser', jobData:{username}}, function(user) {
+    if(user) {
+      res.cookie('username', username, { maxAge: 1000*60 * 5, httpOnly: true })
+      res.render('home');
+    } else {
+      res.redirect('/connect/twitter/');
+    }
+  });
+
+  // dbManager.getUser(username, function(user) {
+  //   if(user) {
+  //     res.cookie('username', username, { maxAge: 1000*60 * 5, httpOnly: true })
+  //     res.render('home');
+  //   } else {
+  //     res.redirect('/connect/twitter/');
+  //   }
+  // });
 
 });
 

@@ -9,7 +9,7 @@ var usersCollection = db.collection('users');;
 module.exports = {getUser, saveUser};
 
 function getUser(username, callback) {
-  usersCollection.find({username: username}, function(err, result) {
+  usersCollection.findOne({username: username}, function(err, result) {
     callback(result);
   });
 }
