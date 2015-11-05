@@ -2,7 +2,6 @@ var express = require('express');
 var path = require('path');
 
 var workerManager = require('./app_modules/worker-manager');
-workerManager.setup();
 
 var dbManager = require('./app_modules/db-manager');
 

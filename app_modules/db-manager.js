@@ -26,7 +26,6 @@ function saveUser(userData, callback) {
     }
 
     usersCollection.update(condition, user, {upsert: true, w: 2}, function(err, result, status) {
-      console.log(err, result, status);
       callback(result);
     });
   });

@@ -1,6 +1,5 @@
 var fork = require('child_process').fork;
 
-module.exports.setup = setup;
 module.exports.addWork = addWork;
 
 var workerQueue = [];
@@ -8,10 +7,9 @@ var worker;
 var isWorking = false;
 var callbacks = [];
 
-function setup() {
-  createObserverForQueue();
-  createAWorker();
-}
+//setup
+createObserverForQueue();
+createAWorker();
 
 function addWork(work, callback) {
   callback = callback || function() {};
