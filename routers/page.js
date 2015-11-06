@@ -25,15 +25,6 @@ router.get('/twitter/authorised/', function (req, res) {
   });
 });
 
-//Checks if twitter session is set. Elese redirect for login.
-// router.use(function(req, res, next) {
-//   if(!req.session.grant) {
-//     res.redirect('/');
-//   } else {
-//     next();
-//   }
-// });
-
 router.get('/:username/', function(req, res) {
   var username = req.params.username;
 
@@ -45,16 +36,6 @@ router.get('/:username/', function(req, res) {
       res.redirect('/connect/twitter/');
     }
   });
-
-  // dbManager.getUser(username, function(user) {
-  //   if(user) {
-  //     res.cookie('username', username, { maxAge: 1000*60 * 5, httpOnly: true })
-  //     res.render('home');
-  //   } else {
-  //     res.redirect('/connect/twitter/');
-  //   }
-  // });
-
 });
 
 module.exports = router;

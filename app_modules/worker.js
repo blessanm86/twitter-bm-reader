@@ -4,11 +4,7 @@ var dbManager = require('./db-manager');
 
 var twitterApi = require('./twitter-api');
 
-var handlers = {
-  'syncUser': syncUser,
-  'syncUsers': syncUsers,
-  getUser
-};
+var handlers = { syncUser, getUser, getProfile, getTweets};
 
 process.on('message', function(work) {
   handlers[work.jobName](work.jobData);
@@ -40,28 +36,17 @@ function syncUser(userData) {
   });
 }
 
-function syncUsers() {
-  dbManager.getUsers().forEach((user) => {
-    updateUser(user);
+function getProfile(data) {
+  twitterApi.fetchProfile(data.username, data.condition, function(err,res, body) {
+    endWork(body);
   });
 }
 
-function updateUser(user) {
-
-  var db = dbManager.getUser(user.username);
-
-  var count = 50;
-  var max_id = user.maxSyncedTweetId;
-  twitterApi.fetchHomeTimeline(user.username, {count, max_id}, function(err,res, tweets) {
-    if(err) {
-      console.log(err);
-    } else {//TODO
-      _.find(tweets, {id_str: max_id});
-    }
+function getTweets(data) {
+  twitterApi.fetchHomeTimeline(data.username, data.condition, function(err,res, body) {
+    endWork(body);
   });
 }
-
-
 
 function endWork(user) {
   process.send(user);
