@@ -3,7 +3,13 @@ var path = require('path');
 
 var workerManager = require('./app_modules/worker-manager');
 
-var dbManager = require('./app_modules/db-manager');
+setInterval(function() {
+  console.log('Scheduling sync');
+
+  workerManager.addWork({jobName: 'syncUsers'}, function() {
+    console.log('Sync Complete');
+  });
+}, 1000 * 5);
 
 var app = express();
 

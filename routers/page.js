@@ -1,13 +1,12 @@
 var express = require('express');
 var router = express.Router();
-var dbManager = require('../app_modules/db-manager');
 var workerManager = require('../app_modules/worker-manager');
 
 router.get('/', function(req, res, next) {
   var username = req.cookies.username;
   var path = username ? `/${username}/` : '/connect/twitter/';
 
-  res.redirect(path);
+  //res.redirect(path);
 });
 
 router.get('/twitter/authorised/', function (req, res) {

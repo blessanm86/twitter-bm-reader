@@ -6,7 +6,7 @@ var db = new TingoDb('./database', {});
 //var db = new MongoDb.Db('test', new MongoDb.Server('locahost', 27017));
 var usersCollection = db.collection('users');;
 
-module.exports = {getUser, saveUser};
+module.exports = {getUser, saveUser, getUsers};
 
 function getUser(username, callback) {
   usersCollection.findOne({username: username}, function(err, result) {
@@ -28,5 +28,11 @@ function saveUser(userData, callback) {
     usersCollection.update(condition, user, {upsert: true, w: 2}, function(err, result, status) {
       callback(result);
     });
+  });
+}
+
+function getUsers(callback) {
+  return usersCollection.find().toArray(function(err, users) {
+    callback(users);
   });
 }

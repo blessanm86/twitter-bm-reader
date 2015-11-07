@@ -20,6 +20,7 @@
     "purest": "^2.0.0",
     "serve-favicon": "~2.2.1",
     "tingodb": "^0.4.2",
-    "tweet-to-html": "^1.0.0"
+    "tweet-to-html": "^1.0.0",
+    "vasync": "^1.6.3"
   }
 }
