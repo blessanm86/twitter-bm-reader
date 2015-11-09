@@ -6,7 +6,7 @@ router.get('/', function(req, res, next) {
   var username = req.cookies.username;
   var path = username ? `/${username}/` : '/connect/twitter/';
 
-  //res.redirect(path);
+  res.redirect(path);
 });
 
 router.get('/twitter/authorised/', function (req, res) {

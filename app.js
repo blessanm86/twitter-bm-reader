@@ -9,7 +9,7 @@ setInterval(function() {
   workerManager.addWork({jobName: 'syncUsers'}, function() {
     console.log('Sync Complete');
   });
-}, 1000 * 5);
+}, 1000 * 30);
 
 var app = express();
 

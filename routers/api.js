@@ -22,9 +22,8 @@ router.get('/:username/profile/', function(req, res) {
 router.get('/:username/tweets/', function(req, res) {
   var response = res;
   var username = req.params.username;
-  var condition = {count: 10};
 
-  workerManager.addWork({jobName: 'getTweets', jobData: {username, condition}}, function(body) {
+  workerManager.addWork({jobName: 'getTweets', jobData: username}, function(body) {
     response.status(200).json(tweetToHTML.parse(body));
   });
 

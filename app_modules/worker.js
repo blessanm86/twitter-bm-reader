@@ -44,80 +44,71 @@ function getProfile(data) {
   });
 }
 
-function getTweets(data) {
-  twitterApi.fetchHomeTimeline(data.username, data.condition, function(err,res, body) {
-    endWork(body);
+function getTweets(username) {
+  dbManager.getUser(username, function(user) {
+    endWork(user.tweets);
   });
 }
 
 function syncUsers() {
   dbManager.getUsers(function(users) {
-    vasync.forEachParallel({
-      'func': syncer,
+    vasync.forEachPipeline({
+      'func': syncUserTweets,
       'inputs': users
     }, function (err, results) {
       if(!err) {
-        console.log(results);
-        endWork(users);
+        var response = results.successes[0];
+        console.log(response.fetchedTweets.length);
+        console.log(response.maxSyncedTweetId);
       }
+      endWork('sync complete');
     })
   });
 }
 
-function syncer(user, callback) {
-  var maxId = user.maxSyncedTweetId;
-  var temp = [];
+function syncUserTweets(user, callback) {
+  var count = 30;
+  var fetchedTweets = [];
+  var maxSyncedTweetId = user.maxSyncedTweetId;
 
-  if(maxId) {
-    function fetchTweets() {
-      var count = 2;
-      var max_id = maxId;
-      console.log(max_id);
-      twitterApi.fetchHomeTimeline(user.username, {count, max_id}, function(err,res, tweets) {
+  function fetchUserTweets(condition) {
+    twitterApi.fetchHomeTimeline(user.username, condition, function(err,res, tweets) {
 
-        if(tweets.length) {
-          var index = _.findIndex(tweets, 'id_str', maxId);
-
-          if(index > 0) {
-            tweets.splice(index, tweets.length - index);
-            user.maxSyncedTweetId = tweets[0].id_str;
-            user.tweets = user.tweets.concat(temp, tweetToHTML.parse(tweets));
-            dbManager.saveUser(user, function() {
-              callback(user);
-            });
-          } else {
-            temp = temp.concat(tweetToHTML.parse(tweets));
-            console.log(tweets);
-            maxId = tweets[tweets.length-1].id_str;
-            fetchTweets();
-          }
-        } else {
-          user.maxSyncedTweetId = maxId;
-          user.tweets = user.tweets.concat(temp);
-          dbManager.saveUser(user, function() {
-            callback(user);
-          });
-        }
-      });
-    }
-
-    fetchTweets();
-  } else {
-    count = 2;
-
-    twitterApi.fetchHomeTimeline(user.username, {count}, function(err,res, tweets) {
       if(err) {
         console.log(err);
+        callback(err);
       } else {
-       user.maxSyncedTweetId = tweets[0].id_str;
-       user.syncCount++;
-       user.tweets = user.tweets.concat(tweetToHTML.parse(tweets));
-       dbManager.saveUser(user, function() {
-         callback(user);
-       });
+        var maxTweetIndex = _.findIndex(tweets, (tweet) => {
+          return tweet.id_str === user.maxSyncedTweetId;
+        });
+
+        if(maxTweetIndex >= 0) {
+          tweets.splice(maxTweetIndex, tweets.length - maxTweetIndex);
+          fetchedTweets = fetchedTweets.concat(tweets);
+
+          //When no new tweet is there, the tweet with the max_id we sent comes back as response which gets removed in
+          //above lines. In that case fetchedTweets is empty and dont do below step.
+          if(fetchedTweets.length) {
+           maxSyncedTweetId = fetchedTweets[0].id_str;
+          }
+
+          //fetched all tweets. Now dump to database.
+          user.maxSyncedTweetId = maxSyncedTweetId;
+          user.tweets.unshift.apply(user.tweets, tweetToHTML.parse(fetchedTweets));
+
+          dbManager.saveUser(user, function() {
+            callback(null, {fetchedTweets, maxSyncedTweetId});
+          });
+        } else {
+          fetchedTweets = fetchedTweets.concat(tweets);
+          maxSyncedTweetId = tweets[tweets.length - 1].id_str;
+          fetchUserTweets({count, max_id: maxSyncedTweetId});
+        }
       }
     });
   }
+
+  fetchUserTweets({count});
 }
 
 function endWork(user) {
