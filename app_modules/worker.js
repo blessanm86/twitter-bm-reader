@@ -46,7 +46,11 @@ function getProfile(data) {
 
 function getTweets(username) {
   dbManager.getUser(username, function(user) {
-    endWork(user.tweets);
+    var tweets = user.tweets.splice(-50);
+
+    dbManager.saveUser(user, function() {
+      endWork(tweets);
+    });
   });
 }
 

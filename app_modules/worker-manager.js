@@ -19,7 +19,6 @@ function QueueManager() {console.log('QueueManager init');
 
     worker.on('message', function done(message) {
       isWorking = false;
-      console.log(callbacks);
       callbacks.shift()(message);
 
       if(workerQueue.length) {
@@ -38,7 +37,7 @@ function QueueManager() {console.log('QueueManager init');
   createObserverForQueue();
   createAWorker();
 
-  this.addWork = function(work, callback) {console.log(work,callback);
+  this.addWork = function(work, callback) {
     callback = callback || function() {};
     callbacks.push(callback);
     workerQueue.push(work);

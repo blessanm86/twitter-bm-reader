@@ -20,7 +20,14 @@ function saveUser(userData, callback) {
 
   getUser(condition, function(user) {
     if(user) {
-      user = merge(user, userData); //user is already in db but new tokens need to be updated in db.
+      //user is already in db but new tokens need to be updated in db.
+      user = merge(user, userData, function(destProperty, sourceProperty) {
+
+        //For array properties, we want the source property to overwrite the dest property.
+        if (Array.isArray(destProperty)) {
+          return sourceProperty;
+        }
+      });
     } else {
       user = merge(newUser, userData); //adding new user
     }
