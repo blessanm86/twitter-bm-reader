@@ -78,7 +78,21 @@ function syncUserTweets(user, callback) {
 
       if(err) {
         console.log(err);
-        callback(err);
+
+        //If fetchedTweets have any tweets save them to db.
+        //This can happen if maxSyncedTweetId is very old. The api will only go back to a certain limit.
+        //Some error happened like rate limit.
+        if(fetchedTweets.length > 0) {
+          maxSyncedTweetId = fetchedTweets[0].id_str;
+          user.maxSyncedTweetId = maxSyncedTweetId;
+          user.tweets.unshift.apply(user.tweets, tweetToHTML.parse(fetchedTweets));
+
+          dbManager.saveUser(user, function() {
+            callback(null, {fetchedTweets, maxSyncedTweetId});
+          });
+        } else {
+          callback(err);
+        }
       } else {
         var maxTweetIndex = _.findIndex(tweets, (tweet) => {
           return tweet.id_str === user.maxSyncedTweetId;
@@ -90,7 +104,7 @@ function syncUserTweets(user, callback) {
 
           //When no new tweet is there, the tweet with the max_id we sent comes back as response which gets removed in
           //above lines. In that case fetchedTweets is empty and dont do below step.
-          if(fetchedTweets.length) {
+          if(fetchedTweets.length > 0) {
            maxSyncedTweetId = fetchedTweets[0].id_str;
           }
 
