@@ -17,6 +17,7 @@
     "lodash.merge": "^3.3.2",
     "lowdb": "^0.10.2",
     "morgan": "~1.5.3",
+    "pauseable": "^0.1.6",
     "purest": "^2.0.0",
     "serve-favicon": "~2.2.1",
     "tingodb": "^0.4.2",
