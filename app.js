@@ -1,15 +1,8 @@
 var express = require('express');
 var path = require('path');
 
-var workerManager = require('./app_modules/worker-manager');
-
-setInterval(function() {
-  console.log('Scheduling sync');
-
-  workerManager.addWork({jobName: 'syncUsers'}, function() {
-    console.log('Sync Complete');
-  });
-}, 1000 * 30);
+var userSync = require('./app_modules/user-sync');
+userSync();
 
 var app = express();
 

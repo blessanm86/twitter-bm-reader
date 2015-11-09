@@ -56,12 +56,14 @@ function syncUsers() {
       'func': syncUserTweets,
       'inputs': users
     }, function (err, results) {
-      if(!err) {
+      if(err) {
+        endWork(false);
+      } else {
         var response = results.successes[0];
         console.log(response.fetchedTweets.length);
         console.log(response.maxSyncedTweetId);
+        endWork(true);
       }
-      endWork('sync complete');
     })
   });
 }
