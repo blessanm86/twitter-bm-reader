@@ -1,8 +1,9 @@
 var express = require('express');
-var router = express.Router();
 var workerManager = require('../app_modules/worker-manager');
 
-router.get('/', function(req, res, next) {
+var router = express.Router();
+
+router.get('/', function(req, res) {
   var username = req.cookies.username;
   var path = username ? `/${username}/` : '/connect/twitter/';
 
@@ -10,18 +11,22 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/twitter/authorised/', function (req, res) {
-  var twitterResponse = req.session.grant.response;
+  var oathResponse = req.session.grant ? req.session.grant.response : null;
 
-  var jobData = {
-    username: twitterResponse.raw.screen_name,
-    accessToken: twitterResponse.access_token,
-    accessSecret: twitterResponse.access_secret
-  };
+  if(oathResponse) {
+    var jobData = {
+      username: oathResponse.raw.screen_name,
+      accessToken: oathResponse.access_token,
+      accessSecret: oathResponse.access_secret
+    };
 
-  //Ensure sync is run atleast once before redirection TODO.
-  workerManager.addWork({jobName: 'syncUser', jobData}, function() {
-    res.redirect(`/${twitterResponse.raw.screen_name}/`);
-  });
+    //Ensure sync is run atleast once before redirection TODO.
+    workerManager.addWork({jobName: 'syncUser', jobData}, function() {
+      res.redirect(`/${oathResponse.raw.screen_name}/`);
+    });
+  } else {
+    res.redirect('/');
+  }
 });
 
 router.get('/:username/', function(req, res) {
