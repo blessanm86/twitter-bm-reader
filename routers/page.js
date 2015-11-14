@@ -1,29 +1,42 @@
 var express = require('express');
-var workerManager = require('../app_modules/worker-manager');
+var twitterApi = require('../app_modules/twitter-api');
+var dbManager = require('../app_modules/db-manager');
 
 var router = express.Router();
 
-router.get('/', function(req, res) {
+router.get('/', (req, res) => {
   var username = req.cookies.username;
   var path = username ? `/${username}/` : '/connect/twitter/';
 
   res.redirect(path);
 });
 
-router.get('/twitter/authorised/', function (req, res) {
+router.get('/twitter/authorised/', (req, res) => {
   var oathResponse = req.session.grant ? req.session.grant.response : null;
+  var username = oathResponse.raw.screen_name;
 
   if(oathResponse) {
-    var jobData = {
-      username: oathResponse.raw.screen_name,
+    var user = {
+      tweets: [],
+      username,
       accessToken: oathResponse.access_token,
       accessSecret: oathResponse.access_secret
     };
 
-    //Ensure sync is run atleast once before redirection TODO.
-    workerManager.addWork({jobName: 'syncUser', jobData}, function() {
-      res.redirect(`/${oathResponse.raw.screen_name}/`);
-    });
+    dbManager.saveUser(user)
+      .then(function(response) {
+        return twitterApi.fetchHomeTimeline(username, {count: 50});
+      })
+      .then(function(tweets) {
+        return dbManager.updateUser(username, tweets);
+      })
+      .then(function(response) {
+        res.redirect(`/${username}/`);
+      })
+      .catch(function(err) {
+        console.log('PROMISE FAILED');
+        console.error(err.stack);
+      });
   } else {
     res.redirect('/');
   }
@@ -32,14 +45,19 @@ router.get('/twitter/authorised/', function (req, res) {
 router.get('/:username/', function(req, res) {
   var username = req.params.username;
 
-  workerManager.addWork({jobName: 'getUser', jobData:{username}}, function(user) {
-    if(user) {
+  dbManager.getUser(username)
+    .then(function(user) {
+      if(user) {
       res.cookie('username', username, { maxAge: 1000*60 * 5, httpOnly: true })
       res.render('home');
-    } else {
-      res.redirect('/connect/twitter/');
-    }
-  });
+      } else {
+        res.redirect('/connect/twitter/');
+      }
+    })
+    .catch(function(err) {
+      console.log('PROMISE FAILED');
+      console.error(err.stack);
+    });
 });
 
 module.exports = router;
