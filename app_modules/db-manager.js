@@ -57,8 +57,8 @@ function DbManager() {
 
   this.getUsers = () => {
     return new Promise((resolve, reject) => {
-      usersCollection.find().toArray((err, users) => {
-        err ? reject(err) : resolve(result);
+      collection.find().toArray((err, users) => {
+        err ? reject(err) : resolve(users);
       });
     });
   }

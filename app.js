@@ -1,8 +1,8 @@
 var express = require('express');
 var path = require('path');
 
-//var userSync = require('./app_modules/user-sync');
-//userSync();
+var userSync = require('./app_modules/user-sync');
+userSync();
 
 var app = express();
 
