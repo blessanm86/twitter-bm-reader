@@ -4,34 +4,44 @@ var twitterApi = require('../app_modules/twitter-api');
 
 var router = express.Router();
 
-router.get('/:username/profile/', dbCheck, function(req, res) {
+router.get('/:username/profile/', dbCheck, (req, res, next) => {
   var username = req.params.username;
   var condition = {screen_name: username};
 
   twitterApi.fetchProfile(username, condition)
-    .then(function(profile) {
+    .then((profile) => {
       res.status(200).json(profile);
-    });
+    })
+    .catch((err) => {
+      next(err);
+    });;
 });
 
-router.get('/:username/tweets/', dbCheck, function(req, res) {
+router.get('/:username/tweets/', dbCheck, (req, res, next) => {
   var response = res;
   var username = req.params.username;
+  var tweets = req.user.tweets.splice(-50);
 
-  response.status(200).json(req.user.tweets);
+  dbManager.updateUser(username, req.user.tweets, true)
+    .then(() => {
+      response.status(200).json(req.user.tweets);
+    })
+    .catch((err) => {
+      next(err);
+    });
 });
 
 
 function dbCheck(req, res, next) {
-  var username = req.params.username; console.log(req.params);
+  var username = req.params.username;
 
   dbManager.getUser(username)
-    .then(function(user) {
+    .then((user) => {
       req.user = user;
 
       user? next() : next(new Error('Invalid User'));
     })
-    .catch(function(err) {
+    .catch((err) => {
       console.log('PROMISE FAILED');
       console.error(err.stack);
     });

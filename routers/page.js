@@ -24,16 +24,16 @@ router.get('/twitter/authorised/', (req, res) => {
     };
 
     dbManager.saveUser(user)
-      .then(function(response) {
+      .then((response) => {
         return twitterApi.fetchHomeTimeline(username, {count: 50});
       })
-      .then(function(tweets) {
-        return dbManager.updateUser(username, tweets);
+      .then((tweets) => {
+        return dbManager.updateUser(username, tweets, false);
       })
-      .then(function(response) {
+      .then((response) => {
         res.redirect(`/${username}/`);
       })
-      .catch(function(err) {
+      .catch((err) => {
         console.log('PROMISE FAILED');
         console.error(err.stack);
       });
@@ -42,11 +42,11 @@ router.get('/twitter/authorised/', (req, res) => {
   }
 });
 
-router.get('/:username/', function(req, res) {
+router.get('/:username/', (req, res) => {
   var username = req.params.username;
 
   dbManager.getUser(username)
-    .then(function(user) {
+    .then((user) => {
       if(user) {
       res.cookie('username', username, { maxAge: 1000*60 * 5, httpOnly: true })
       res.render('home');
@@ -54,7 +54,7 @@ router.get('/:username/', function(req, res) {
         res.redirect('/connect/twitter/');
       }
     })
-    .catch(function(err) {
+    .catch((err) => {
       console.log('PROMISE FAILED');
       console.error(err.stack);
     });

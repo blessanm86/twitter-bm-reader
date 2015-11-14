@@ -18,7 +18,7 @@ function fetchProfile(username, condition) {
 function fetchHomeTimeline(username, condition) {
   var params = {path: 'statuses/home_timeline', condition};
 
-  return fetchFromTwitter(username, params).then(function(tweets){
+  return fetchFromTwitter(username, params).then((tweets) => {
     return Promise.resolve(tweetToHTML.parse(tweets));
   });
 }
@@ -26,8 +26,8 @@ function fetchHomeTimeline(username, condition) {
 
 function fetchFromTwitter(username, params) {
   return dbManager.getUser(username)
-    .then(function(dbUser) {
-      return new Promise(function(resolve, reject) {
+    .then((dbUser) => {
+      return new Promise((resolve, reject) => {
         params.tokens = dbUser;
 
         var path = params.path;
@@ -43,7 +43,7 @@ function fetchFromTwitter(username, params) {
           .select(path)
           .where(condition)
           .auth(accessToken, accessSecret)
-          .request(function(err,res, response) {
+          .request((err,res, response) => {
             err ? reject(err) : resolve(response);
           });
       });
