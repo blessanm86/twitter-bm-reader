@@ -1,96 +1,112 @@
-getProfile();
+(function() {
+  var tweetListNode, loaderNode;
 
-function getProfile() {
-  fetchData('profile', function(profile) {
-    document.querySelector('.bmr-header .avatar').setAttribute('src', profile.profile_image_url);
-    document.querySelector('.bmr-header .author-name').innerHTML = profile.name + '(@' + profile.screen_name + ')';
-    getTweets();
-  });
-}
+  cacheSelectors();
+  setupEventListeners();
+  getProfile();
+  getTweets();
 
-function getTweets() {
-  fetchData('tweets', function(tweets) {
-    tweets = tweets.map(function(tweet) {
-      if(tweet.retweeted_status) {
-        var tweetId = tweet.retweeted_status.id_str;
-        var username = tweet.retweeted_status.user.screen_name;
-        var profileImage = tweet.retweeted_status.user.profile_image_url;
-        var profileName = tweet.retweeted_status.user.name + '(@' + tweet.retweeted_status.user.screen_name + ')';
+  function cacheSelectors() {
+    tweetListNode = document.querySelector('.bmr-tweet-list');
+    loaderNode = document.querySelector('.uil-squares-css');
+  }
+
+  function setupEventListeners() {
+    tweetListNode.addEventListener('click', function(event) {
+      var url = '';
+      var target = event.target; // Clicked element
+
+      if(target.tagName === 'A') {
+        //For anchor elements open their link in a new window.
+
+        event.preventDefault();
+        url = target.href;
       } else {
-        var tweetId = tweet.id_str;
-        var username = tweet.user.screen_name;
-        var profileImage = tweet.user.profile_image_url;
-        var profileName = tweet.user.name + '(@' + tweet.user.screen_name + ')';
+        //Search upto li tag.
+
+        while (target && target.parentNode !== tweetListNode) {
+          target = target.parentNode; // If the clicked element isn't a direct child
+          if(!target) { return; } // If element doesn't exist
+        }
+
+        if (target.tagName === 'LI'){
+          var id = target.getAttribute('data-id');
+          var username = target.getAttribute('data-username');
+
+          if(id && username) {
+            url = `https://twitter.com/${username}/status/${id}`;
+          } else {
+            getTweets();
+            return;
+          }
+
+        }
       }
-      var tweetMarkup = tweet.html;
 
-      return `<li class="brm-list-item" data-id="${tweetId}" data-username="${username}">
-
-        <div class="bookmark"></div>
-
-        <div class="brm-tweet-author">
-          <img class="avatar" src="${profileImage}"/>
-          <h4 class="author-name">${profileName}</h4>
-          <span class="time-difference">3h</span>
-        </div>
-
-        <div class="brm-tweet-text">${tweetMarkup}</div>
-      </li>`;
+      window.open(url, '_blank');
     });
+  }
 
-    document.querySelector('.bmr-tweet-list').innerHTML = tweets.join('');
-    document.querySelector('.uil-squares-css').hidden = true;
+  function getProfile() {
+    fetchData('profile').then(function(profile) {
+      document.querySelector('.bmr-header .avatar').setAttribute('src', profile.profile_image_url);
+      document.querySelector('.bmr-header .author-name').innerHTML = profile.name + '(@' + profile.screen_name + ')';
+    });
+  }
 
-    setupEventListeners();
-  });
-}
+  function getTweets() {
+    var domParser = new DOMParser();
+    var fragment = document.createDocumentFragment();
 
-function fetchData(url, callback) {
-  return fetch(url, {
-    method: 'get',
-    credentials: 'same-origin'
-  })
-  .then(function(response) {
-    return response.json();
-  })
-  .then(callback)
-  .catch(function(err) {
-    console.log('Fetch Err');
-    console.log(err);
-  });
-}
+    fetchData('tweets').then(function(response) {
+      if(response.tweets.length === 0) {
+        alert('No more tweets at the moment. Please try again after some time.');
+      } else {
+        response.tweets.forEach(function(tweet) {
+          var tweetMarkup = tweet.html;
 
-function setupEventListeners() {
-  var list = document.querySelector('.bmr-tweet-list');
-  var iframe = document.querySelector('.bmr-tweet-page');
+          if(tweet.retweeted_status) {
+            tweet = tweet.retweeted_status;
+          }
 
-  list.addEventListener('click', function(event) {
-    var url = '';
-    var target = event.target; // Clicked element
+          var tweetId = tweet.id_str;
+          var username = tweet.user.screen_name;
+          var profileImage = tweet.user.profile_image_url;
+          var profileName = tweet.user.name + '(@' + tweet.user.screen_name + ')';
+          var tweetTime = moment.duration(tweet.created_at).humanize();
 
-    if(target.tagName === 'A') {
-      //For anchor elements open their link in a new window.
+          var tweetNodeStr = `<li class="bmr-list-item" data-id="${tweetId}" data-username="${username}">
 
-      event.preventDefault();
-      url = target.href;
-    } else {
-      //Search upto li tag.
+            <div class="bmr-tweet-author">
+              <img class="avatar" src="${profileImage}"/>
+              <h4 class="author-name">${profileName}</h4>
+              <span class="time-difference">${tweetTime}</span>
+            </div>
 
-      while (target && target.parentNode !== list) {
-        target = target.parentNode; // If the clicked element isn't a direct child
-        if(!target) { return; } // If element doesn't exist
+            <div class="bmr-tweet-text">${tweetMarkup}</div>
+          </li>`;
+
+          fragment.appendChild(domParser.parseFromString(tweetNodeStr, "text/html").body.firstChild);
+        });
+
+        tweetListNode.insertBefore(fragment, document.querySelector('.bmr-item-next'));
       }
+    });
+  }
 
-      if (target.tagName === 'LI'){
-        var id = target.getAttribute('data-id');
-        var username = target.getAttribute('data-username');
-        //iframe.setAttribute('src', `https://twitter.com/${username}/status/${id}`); //Cant be done to frameblocker
-        url = `https://twitter.com/${username}/status/${id}`;
-
-      }
-    }
-
-    window.open(url, '_blank');
-  });
-}
-
+  function fetchData(url, callback) {
+    loaderNode.hidden = false;
+    return fetch(url, {
+      method: 'get',
+      credentials: 'same-origin'
+    })
+    .then(function(response) {
+      loaderNode.hidden = true;
+      return response.json();
+    })
+    .catch(function(err) {
+      console.log('Fetch Err');
+      console.log(err);
+    });
+  }
+}(window))

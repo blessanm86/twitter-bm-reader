@@ -26,7 +26,7 @@ router.get('/:username/tweets/', dbCheck, (req, res, next) => {
 
   dbManager.updateUser(username, req.user.tweets, true)
     .then(() => {
-      response.status(200).json(tweets);
+      response.status(200).json({tweets, remainingCount:req.user.tweets.length});
     })
     .catch((err) => {
       next(err);
