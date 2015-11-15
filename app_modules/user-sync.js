@@ -21,7 +21,7 @@ function syncUser(user) {
             fetchedTweets = fetchedTweets.concat(tweets);
 
             //Save fetched tweets to db.
-            console.log(1,fetchedTweets.length);
+            console.log('Fetch Complete -> ',fetchedTweets.length);
             return dbManager.updateUser(user.username, fetchedTweets, false)
               .then(resolve);
           } else {
@@ -37,7 +37,7 @@ function syncUser(user) {
           //This can happen if latestSyncedTweetId is very old. The api will only go back to a certain limit.
           //Some error happened like rate limit.
           if(fetchedTweets.length > 0) {
-            console.log(2,fetchedTweets.length);
+            console.log('Fetch Incomplete -> ',fetchedTweets.length);
             dbManager.updateUser(user.username, fetchedTweets, false)
               .then(resolve);
           } else {

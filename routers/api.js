@@ -20,11 +20,13 @@ router.get('/:username/profile/', dbCheck, (req, res, next) => {
 router.get('/:username/tweets/', dbCheck, (req, res, next) => {
   var response = res;
   var username = req.params.username;
-  var tweets = req.user.tweets.splice(-50);
+
+  //Take last 50 elements and reverse to make sure old tweets are shown first.
+  var tweets = req.user.tweets.splice(-50).reverse();
 
   dbManager.updateUser(username, req.user.tweets, true)
     .then(() => {
-      response.status(200).json(req.user.tweets);
+      response.status(200).json(tweets);
     })
     .catch((err) => {
       next(err);
