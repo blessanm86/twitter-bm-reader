@@ -31,8 +31,6 @@ function syncUser(user) {
           }
         })
         .catch((err) => {
-          console.log(err);
-
           //If fetchedTweets have any tweets save them to db.
           //This can happen if latestSyncedTweetId is very old. The api will only go back to a certain limit.
           //Some error happened like rate limit.
@@ -49,9 +47,6 @@ function syncUser(user) {
     return fetchUserTweets({count})
       .then(() => {
         resolve();
-      })
-      .catch((err) => {
-        console.log(err.stack);
       });
   });
 }
@@ -68,7 +63,7 @@ module.exports = function() {
         console.log('Synced');
       })
       .catch((err) => {
-
+        console.log('Sync Failed', err);
         //In case of error like rate limit, pause syncing for 30mins
         syncInterval.pause(1000 * 60 * 30);
       });
