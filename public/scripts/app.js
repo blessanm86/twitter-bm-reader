@@ -98,14 +98,19 @@
     loaderNode.hidden = false;
     return fetch(url, {
       method: 'get',
-      credentials: 'same-origin'
+      credentials: 'same-origin',
+      headers: new Headers({accept: 'application/json'})
     })
     .then(function(response) {
       loaderNode.hidden = true;
-      return response.json();
+      if(response.status === 200) {
+        return response.json();
+      } else {
+        return response.json().then(err => Promise.reject(err));
+      }
     })
     .catch(function(err) {
-      console.log('Fetch Err');
+      console.log('Fetch Error');
       console.log(err);
     });
   }

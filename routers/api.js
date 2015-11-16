@@ -44,8 +44,7 @@ function dbCheck(req, res, next) {
       user? next() : next(new Error('Invalid User'));
     })
     .catch((err) => {
-      console.log('PROMISE FAILED');
-      console.error(err.stack);
+      next(err);
     });
 }
 

@@ -13,9 +13,9 @@ router.get('/', (req, res) => {
 
 router.get('/twitter/authorised/', (req, res) => {
   var oathResponse = req.session.grant ? req.session.grant.response : null;
-  var username = oathResponse.raw.screen_name;
 
   if(oathResponse) {
+    var username = oathResponse.raw.screen_name;
     var user = {
       tweets: [],
       username,
