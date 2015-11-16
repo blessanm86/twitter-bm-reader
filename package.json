@@ -14,14 +14,11 @@
     "grant-express": "^3.5.1",
     "hbs": "~2.9.0",
     "lodash": "^3.10.1",
-    "lodash.merge": "^3.3.2",
-    "lowdb": "^0.10.2",
     "morgan": "~1.5.3",
     "pauseable": "^0.1.6",
     "purest": "^2.0.0",
     "serve-favicon": "~2.2.1",
     "tingodb": "^0.4.2",
-    "tweet-to-html": "^1.0.0",
-    "vasync": "^1.6.3"
+    "tweet-to-html": "^1.0.0"
   }
 }
