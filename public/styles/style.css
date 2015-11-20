@@ -103,6 +103,13 @@
           text-decoration: underline;
         }
 
+        .bmr-tweet-text .quoted-tweet {
+          margin-top: .5rem;
+          padding: .5rem;
+          border-radius: .5rem;
+          border: 2px solid #e1e8ed;
+        }
+
     .bmr-item-next {
       text-align: center;
       cursor: pointer;
