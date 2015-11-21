@@ -1,6 +1,7 @@
 var express = require('express');
 var twitterApi = require('../app_modules/twitter-api');
 var dbManager = require('../app_modules/db-manager');
+var whiteList = require('../config/white-list.json');
 
 var router = express.Router();
 
@@ -23,20 +24,26 @@ router.get('/twitter/authorised/', (req, res) => {
       accessSecret: oathResponse.access_secret
     };
 
-    dbManager.saveUser(user)
-      .then((response) => {
-        return twitterApi.fetchHomeTimeline(username, {count: 50});
-      })
-      .then((tweets) => {
-        return dbManager.updateUser(username, tweets, false);
-      })
-      .then((response) => {
-        res.redirect(`/${username}/`);
-      })
-      .catch((err) => {
-        console.log('PROMISE FAILED');
-        console.error(err.stack);
-      });
+    //Check if user is in whitelist. Only let white listed users use this app.
+    if(whiteList.indexOf(username) < 0) {
+      response.status(403).json({message:
+          "You're username is not in the whitelist. Please host this app on your own server for your personal use."});
+    } else {
+      dbManager.saveUser(user)
+        .then((response) => {
+          return twitterApi.fetchHomeTimeline(username, {count: 50});
+        })
+        .then((tweets) => {
+          return dbManager.updateUser(username, tweets, false);
+        })
+        .then((response) => {
+          res.redirect(`/${username}/`);
+        })
+        .catch((err) => {
+          console.log('PROMISE FAILED');
+          console.error(err.stack);
+        });
+    }
   } else {
     res.redirect('/');
   }
