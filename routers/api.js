@@ -41,7 +41,9 @@ function dbCheck(req, res, next) {
     .then((user) => {
       req.user = user;
 
-      user? next() : next(new Error('Invalid User'));
+      var err = new Error('Unauthorized User');
+      err.status = 401;
+      user? next() : next(err);
     })
     .catch((err) => {
       next(err);
