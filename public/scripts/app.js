@@ -65,7 +65,10 @@
         response.tweets.forEach(function(tweet) {
           var tweetMarkup = tweet.html;
 
+          var retweetStatusClass= 'hide';
           if(tweet.retweeted_status) {
+            var retweetProfileName = tweet.user.name + '(@' + tweet.user.screen_name + ')';
+            retweetStatusClass = 'show';
             tweet = tweet.retweeted_status;
           }
 
@@ -76,6 +79,8 @@
           var tweetTime = moment.duration(tweet.created_at).humanize();
 
           var tweetNodeStr = `<li class="bmr-list-item" data-id="${tweetId}" data-username="${username}">
+
+            <div class="bmr-retweet-status ${retweetStatusClass}">${retweetProfileName} Retweeted</div>
 
             <div class="bmr-tweet-author">
               <img class="avatar" src="${profileImage}"/>

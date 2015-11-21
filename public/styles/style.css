@@ -2,6 +2,14 @@
   box-sizing: border-box;
 }
 
+.hide {
+  display: none;
+}
+
+.show {
+  display: block;
+}
+
 .bmr-app {
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
   margin: 0;
@@ -60,6 +68,11 @@
       border-bottom: 2px solid #e1e8ed;
     }
 
+      .bmr-retweet-status {
+        color: #C7D3E6;
+        font-weight: bold;
+      }
+
       .bmr-tweet-author {
         margin: 0;
         display: flex;
@@ -80,7 +93,7 @@
           color: #C9C9C9;
         }
 
-      .bmr-tweet-text {
+      .bmr-tweet-text, .bmr-retweet-status {
         margin-left: calc(.5rem + 50px);
       }
 
