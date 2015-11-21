@@ -1,6 +1,6 @@
 # .gitignore sample
 
 #ignore all files in this dir...
-*
+grant-oauth.json
 #... except for this one.
 !.gitignore
