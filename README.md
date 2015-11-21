@@ -26,6 +26,8 @@ Follow the below steps to run the app
 3. `npm start`
 4. Go to `http://localhost:3000/`
 
+### In case there is an issue with the rendering of a tweet on the client side, report the issue to [__tweet-to-html__](https://github.com/blessenm/tweet-to-html "tweet to html") repo.
+
 ##Issues Or Contributions
 
 * Post issues/enhancements in the github issue tracker.
