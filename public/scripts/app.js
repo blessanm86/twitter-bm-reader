@@ -50,7 +50,7 @@
   function getProfile() {
     fetchData('profile').then(function(profile) {
       document.querySelector('.bmr-header .avatar').setAttribute('src', profile.profile_image_url);
-      document.querySelector('.bmr-header .author-name').innerHTML = profile.name + '(@' + profile.screen_name + ')';
+      document.querySelector('.bmr-header .author-name').innerHTML = `${profile.name} (@${profile.screen_name})`;
     });
   }
 
@@ -110,8 +110,8 @@
       }
     })
     .catch(function(err) {
-      console.log('Fetch Error');
       console.log(err);
+      return Promise.reject(err);
     });
   }
 }(window))
