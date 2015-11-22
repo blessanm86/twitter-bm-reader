@@ -101,6 +101,9 @@
 
   function fetchData(url, callback) {
     loaderNode.hidden = false;
+
+    url = location.href.replace(/\/?$/, '/') + url;
+
     return fetch(url, {
       method: 'get',
       credentials: 'same-origin',
